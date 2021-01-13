@@ -32,3 +32,9 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+docker-compose up -d postgres
+docker-compose exec postgres bash
+psql -h localhost -d my_db -U nico
+\d+
+\q
