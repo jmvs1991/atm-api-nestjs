@@ -17,7 +17,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Tarjeta')
 @Controller('api/tarjeta')
 export class TarjetaController {
-  constructor(private tarjetaService: TarjetaService) {}
+  constructor(private tarjetaService: TarjetaService) { }
 
   @Get()
   async getAll(): Promise<TarjetaResponse> {
@@ -25,9 +25,10 @@ export class TarjetaController {
 
     try {
       const tarjetas: TarjetaEntity[] = await this.tarjetaService.findAll();
+
       respuesta.Resultado = true;
       respuesta.Mensaje = '';
-      respuesta.Datos = tarjetas;
+      respuesta.Datos = tarjetas
     } catch (error) {
       respuesta.Resultado = false;
       respuesta.Mensaje = error.message;
@@ -126,6 +127,82 @@ export class TarjetaController {
     }
 
     return respuesta;
+  }
+
+  @Post('ValidarPin')
+  @HttpCode(200)
+  async ValidarPin(@Body() Body: TarjetaRequest): Promise<TarjetaResponse> {
+
+    let respuesta: TarjetaResponse = new TarjetaResponse();
+
+    try {
+
+      const { Numero: NumeroRq, Pin: PinRq } = Body;
+
+      if (!NumeroRq) {
+        respuesta.Resultado = false;
+        respuesta.Mensaje = 'Debe indicar el nro de la tarjeta.';
+        return respuesta;
+      }
+
+      if (!PinRq) {
+        respuesta.Resultado = false;
+        respuesta.Mensaje = 'Debe indicar el pin de la tarjeta';
+        return respuesta;
+      }
+
+      const tarjetas: TarjetaEntity[] = await this.tarjetaService.findByNro(NumeroRq);
+
+      if (tarjetas.length <= 0 || !tarjetas) {
+        respuesta.Resultado = false;
+        respuesta.Mensaje = 'El nro de la tarjeta no fue encontrado.';
+        return respuesta;
+      }
+
+      let tarjeta: TarjetaEntity = tarjetas[0];
+      const { IdTarjeta, Bloqueado, Pin } = tarjeta;
+
+      if (Bloqueado) {
+        respuesta.Resultado = false;
+        respuesta.Mensaje = 'La tarjeta se encuentra bloqueada.';
+        return respuesta;
+      }
+
+      if (Pin === PinRq) {
+
+        tarjeta.Intentos = 0;
+        tarjeta.Bloqueado = false;
+
+        const tarjetaUpdate: TarjetaEntity = await this.tarjetaService.update(IdTarjeta, tarjeta);
+
+        respuesta.Resultado = true;
+        respuesta.Mensaje = '';
+        respuesta.Datos = [tarjetaUpdate]
+
+      } else {
+
+        tarjeta.Intentos++;
+        const { Intentos } = tarjeta;
+
+        if (Intentos >= 4) {
+          tarjeta.Bloqueado = true;
+        }
+
+        const tarjetaUpdate: TarjetaEntity = await this.tarjetaService.update(IdTarjeta, tarjeta);
+
+        respuesta.Resultado = true;
+        respuesta.Mensaje = '';
+        respuesta.Datos = [tarjetaUpdate];
+
+      }
+
+    } catch (error) {
+      respuesta.Resultado = false;
+      respuesta.Mensaje = error.message;
+    }
+
+    return respuesta;
+
   }
 
   @Put(':id')

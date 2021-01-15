@@ -6,10 +6,10 @@ export class TarjetaResponse implements Respuesta {
 
   @ApiProperty()
   Resultado: boolean = false;
-  
+
   @ApiProperty()
   Mensaje: string = '';
-  
+
   @ApiProperty()
   Datos: TarjetaEntity[] = [];
 }

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { TarjetaModule } from './tarjeta/tarjeta.module';
+import { BalanceModule } from "./balance/balance.module";
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { TarjetaModule } from './tarjeta/tarjeta.module';
       retryDelay: 3000,
       retryAttempts: 10
     }),
-    TarjetaModule
+    TarjetaModule,
+    BalanceModule
   ],
   controllers: [],
   providers: [],
