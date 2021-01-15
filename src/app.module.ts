@@ -7,7 +7,7 @@ import { TarjetaModule } from './tarjeta/tarjeta.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
-      port: 5432,
+      port: 5433,
       username: 'nico',
       password: 'postgres',
       database: 'my_db',

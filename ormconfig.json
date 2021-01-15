@@ -1,0 +1,19 @@
+{
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5433,
+    "username": "nico",
+    "password": "postgres",
+    "database": "my_db",
+    "entities": [
+        "src/**/*.entity.ts"
+    ],
+    "synchronize": false,
+    "migrationsTableName": "migrations",
+    "migrations": [
+        "src/database/migrations/*.ts"
+    ],
+    "cli": {
+        "migrationsDir": "src/database/migrations"
+    }
+}
